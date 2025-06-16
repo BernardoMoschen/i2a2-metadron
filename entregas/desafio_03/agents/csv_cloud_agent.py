@@ -18,7 +18,7 @@ class CSVAgent:
     def list_files(self):
         return list(self.dataframes.keys())
 
-    def query_data(self, filenameAPI_KEY, question):
+    def query_data(self, filename, question):
         df = self.dataframes[filename]
         sample = df.head(10).to_csv(index=False)
         prompt = (
