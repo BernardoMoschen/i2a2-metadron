@@ -18,7 +18,7 @@ class CSVAgent:
     def list_files(self):
         return list(self.dataframes.keys())
 
-    def query_data(self, filename, question):
+    def query_data(self, filenameAPI_KEY, question):
         df = self.dataframes[filename]
         sample = df.head(10).to_csv(index=False)
         prompt = (
@@ -28,7 +28,7 @@ class CSVAgent:
             f"Answer as clearly and accurately as possible."
         )
 
-        api_key = st.secrets["api_key"]
+        api_key = st.secrets["API_KEY"]
 
         headers = {
             "Authorization": f"Bearer {api_key}",
