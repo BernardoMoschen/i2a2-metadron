@@ -4,7 +4,7 @@ run-terminal:
 
 # Roda a interface web com Streamlit
 run-streamlit:
-	streamlit run src/interface/streamlit/streamlit.ui.py
+	streamlit run src/interface/streamlit/streamlit.app.py
 
 # Inicia o servidor Ollama (necessário para o agente LLM)
 ollama-serve:

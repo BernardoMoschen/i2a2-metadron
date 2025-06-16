@@ -13,7 +13,7 @@ st.write(
     "Agente do grupo Metadron para análise de arquivos CSV."
     "\n"
     "Usa o modelo `llama3:8b` para responder perguntas sobre os dados contidos em arquivos CSV."
-    "Para mais informações sobre o projeto consulte o[repositório](https://github.com/BernardoMoschen/i2a2-metadron/tree/main/entregas/desafio_03)."
+    "Para mais informações sobre o projeto consulte o [repositório](https://github.com/BernardoMoschen/i2a2-metadron/tree/main/entregas/desafio_03)."
 )
 uploaded_file = st.file_uploader("Arraste ou selecione um arquivo CSV ou ZIP", type=["csv", "zip"])
 
