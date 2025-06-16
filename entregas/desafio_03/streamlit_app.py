@@ -1,7 +1,6 @@
 import sys
 import os
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..')))
-from src.agents.csv_agent import CSVAgent
+from agents.csv_agent import CSVAgent
 import streamlit as st
 import pandas as pd
 import zipfile
