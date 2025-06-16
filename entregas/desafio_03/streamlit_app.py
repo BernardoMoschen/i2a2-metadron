@@ -17,7 +17,7 @@ st.write(
 uploaded_file = st.file_uploader("Arraste ou selecione um arquivo CSV ou ZIP", type=["csv", "zip"])
 
 if uploaded_file:
-    data_folder = "src/data"
+    data_folder = "./data"
     os.makedirs(data_folder, exist_ok=True)
     # Limpa arquivos antigos
     for f in os.listdir(data_folder):

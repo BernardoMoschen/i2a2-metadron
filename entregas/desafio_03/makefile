@@ -1,7 +1,3 @@
-# Roda a aplicação no terminal (modo texto)
-run-terminal:
-	python3 src/main.py
-
 # Roda a interface web com Streamlit
 run-streamlit:
 	streamlit run ./streamlit_app.py
@@ -20,6 +16,6 @@ install:
 
 # Limpa arquivos CSV antigos da pasta de dados
 clean-data:
-	rm -f src/data/*.csv
+	rm -f ./data/*.csv
 
 .PHONY: run-terminal run-streamlit ollama-serve ollama-pull install clean-data

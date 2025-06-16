@@ -5,7 +5,7 @@ import pandas as pd
 import os
 
 class CSVAgent:
-    def __init__(self, data_folder="src/data"):
+    def __init__(self, data_folder="./data"):
         self.data_folder = data_folder
         self.dataframes = {}
 
