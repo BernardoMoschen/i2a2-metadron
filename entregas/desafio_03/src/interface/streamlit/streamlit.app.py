@@ -7,52 +7,14 @@ import pandas as pd
 import zipfile
 
 # --- Estilo customizado ---
-st.set_page_config(page_title="CSV QA App", page_icon="📊", layout="centered")
-st.markdown("""
-    <style>
-    .main {
-        background-color: #f5f7fa;
-    }
-    .stApp {
-        background: linear-gradient(120deg, #e0e7ff 0%, #f5f7fa 100%);
-    }
-    .css-1d391kg, .css-1v0mbdj, .css-1cpxqw2 {background: transparent !important;}
-    .stButton>button {
-        background-color: #6366f1;
-        color: white;
-        border-radius: 8px;
-        padding: 0.5em 1.5em;
-        font-weight: bold;
-        border: none;
-    }
-    .stButton>button:hover {
-        background-color: #4338ca;
-        color: #fff;
-    }
-    .stTextInput>div>div>input {
-        border-radius: 8px;
-        border: 1.5px solid #6366f1;
-        padding: 0.5em;
-    }
-    .stSelectbox>div>div>div>div {
-        border-radius: 8px;
-        border: 1.5px solid #6366f1;
-    }
-    .stMarkdown h2 {
-        color: #4338ca;
-    }
-    </style>
-""", unsafe_allow_html=True)
-
-st.markdown("""
-# 📊 CSV QA App
-Pergunte sobre seus arquivos CSV de forma fácil e inteligente!
-""")
-
-st.markdown("""
-#### Passo 1: Faça upload de um arquivo CSV ou ZIP
-""")
-
+st.set_page_config(page_title="CSV Agent- Metadron", page_icon="📊", layout="centered")
+st.title("💬 CSV Agent- Metadron - Desafio 03")
+st.write(
+    "Agente do grupo Metadron para análise de arquivos CSV."
+    "\n"
+    "Usa o modelo `llama3:8b` para responder perguntas sobre os dados contidos em arquivos CSV."
+    "Para mais informações sobre o projeto consulte o[repositório](https://github.com/BernardoMoschen/i2a2-metadron/tree/main/entregas/desafio_03)."
+)
 uploaded_file = st.file_uploader("Arraste ou selecione um arquivo CSV ou ZIP", type=["csv", "zip"])
 
 if uploaded_file:
