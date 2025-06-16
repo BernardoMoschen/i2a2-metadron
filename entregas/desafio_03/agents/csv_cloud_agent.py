@@ -1,12 +1,16 @@
-import requests
 import pandas as pd
 import os
 import streamlit as st
+from openai import OpenAI
 
 class CSVAgent:
     def __init__(self, folder):
         self.folder = folder
         self.dataframes = {}
+        self.client = OpenAI(
+            base_url="https://openrouter.ai/api/v1",
+            api_key=f"{st.secrets['API_KEY']}",
+        )
 
     def load_data(self):
         for file in os.listdir(self.folder):
@@ -27,25 +31,17 @@ class CSVAgent:
             f"User question: {question}\n\n"
             f"Answer as clearly and accurately as possible."
         )
-
-        api_key = st.secrets["API_KEY"]
-
-        headers = {
-            "Authorization": f"Bearer {api_key}",
-            "HTTP-Referer": "https://your-username.streamlit.app",
-            "X-Title": "csv-agent-metadron"
-        }
-
-        data = {
-            "model": "meta-llama/llama-3-8b-instruct",
-            "messages": [
-                {"role": "user", "content": prompt}
-            ]
-        }
-
-        response = requests.post("https://openrouter.ai/api/v1/chat/completions", headers=headers, json=data)
-
-        if response.status_code == 200:
-            return response.json()["choices"][0]["message"]["content"]
-        else:
-            return f"Erro ao consultar modelo: {response.status_code} - {response.text}"
+        
+        try:
+            completion = self.client.chat.completions.create(
+                model="meta-llama/llama-3-8b-instruct",
+                messages=[
+                    {
+                        "role": "user",
+                        "content": prompt
+                    }
+                ]
+            )
+            return completion.choices[0].message.content
+        except Exception as e:
+            st.error(f"Ocorreu um erro ao consultar o modelo: {e}")
