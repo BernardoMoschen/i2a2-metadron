@@ -1,9 +1,11 @@
 import sys
 import os
-from agents.csv_agent import CSVAgent
+from agents.csv_cloud_agent import CSVAgent
 import streamlit as st
 import pandas as pd
 import zipfile
+
+
 
 # --- Estilo customizado ---
 st.set_page_config(page_title="CSV Agent- Metadron", page_icon="📊", layout="centered")
@@ -38,7 +40,7 @@ if uploaded_file:
     agent.load_data()
     files = agent.list_files()
     st.markdown("""
-    #### Passo 2: Selecione o arquivo CSV para análise
+    #### P asso 2: Selecione o arquivo CSV para análise
     """)
     selected_file = st.selectbox("Selecione o arquivo CSV", files)
     if selected_file:
@@ -53,4 +55,4 @@ if uploaded_file:
             with st.spinner("Pensando..."):
                 answer = agent.query_data(selected_file, question)
             st.success("Resposta:")
-            st.markdown(f"<div style='background:#fff;border-radius:8px;padding:1em 1.5em;border:1.5px solid #6366f1;font-size:1.1em'>{answer}</div>", unsafe_allow_html=True)
+            st.markdown(f"<div style='background:transparent;border-radius:8px;padding:1em 1.5em;border:1.5px solid #6366f1;font-size:1.1em'>{answer}</div>", unsafe_allow_html=True)

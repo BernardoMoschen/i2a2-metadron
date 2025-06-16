@@ -7,3 +7,4 @@ pandas
 numpy
 tabulate
 streamlit
+requests
