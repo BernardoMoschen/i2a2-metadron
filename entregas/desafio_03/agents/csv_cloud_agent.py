@@ -28,7 +28,7 @@ class CSVAgent:
             f"Answer as clearly and accurately as possible."
         )
 
-        api_key = st.secrets["api_keys"]["openRouter"]
+        api_key = st.secrets["api_key"]
 
         headers = {
             "Authorization": f"Bearer {api_key}",
