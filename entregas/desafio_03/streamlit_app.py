@@ -8,14 +8,26 @@ import zipfile
 
 # --- Estilo customizado ---
 st.set_page_config(page_title="CSV Agent- Metadron", page_icon="📊", layout="centered")
-st.title("💬 CSV Agent- Metadron - Desafio 03")
+st.title(f"CSV Agent- Metadron - Desafio 03")
+col1, col2, col3  = st.columns(3)
+
+with col1:st.badge("I2A2", color='red')
+with col3: st.badge("Chatbot", color='orange')
+with col2: st.badge("llama-3-8b")
+
+st.divider()
+
 st.write(
     "Agente do grupo Metadron para análise de arquivos CSV."
     "\n"
     "Usa o modelo `llama3:8b` para responder perguntas sobre os dados contidos em arquivos CSV."
     "Para mais informações sobre o projeto consulte o [repositório](https://github.com/BernardoMoschen/i2a2-metadron/tree/main/entregas/desafio_03)."
 )
-uploaded_file = st.file_uploader("Arraste ou selecione um arquivo CSV ou ZIP", type=["csv", "zip"])
+
+st.divider()
+
+
+uploaded_file = st.file_uploader("Arraste ou selecione um arquivo CSV ou ZIP", type=["csv", "zip"], help="")
 
 if uploaded_file:
     data_folder = "./data"
@@ -39,7 +51,7 @@ if uploaded_file:
     agent.load_data()
     files = agent.list_files()
     st.markdown("""
-    #### P asso 2: Selecione o arquivo CSV para análise
+    #### Passo 2: Selecione o arquivo CSV para análise
     """)
     selected_file = st.selectbox("Selecione o arquivo CSV", files)
     if selected_file:
