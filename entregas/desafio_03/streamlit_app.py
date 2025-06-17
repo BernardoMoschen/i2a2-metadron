@@ -1,20 +1,33 @@
-import sys
 import os
-from agents.csv_agent import CSVAgent
+from agents.csv_cloud_agent import CSVAgent
 import streamlit as st
 import pandas as pd
 import zipfile
 
+
+
 # --- Estilo customizado ---
 st.set_page_config(page_title="CSV Agent- Metadron", page_icon="📊", layout="centered")
-st.title("💬 CSV Agent- Metadron - Desafio 03")
+st.title(f"CSV Agent- Metadron - Desafio 03")
+col1, col2, col3  = st.columns(3)
+
+with col1:st.badge("I2A2", color='red')
+with col3: st.badge("Chatbot", color='orange')
+with col2: st.badge("llama-3-8b")
+
+st.divider()
+
 st.write(
     "Agente do grupo Metadron para análise de arquivos CSV."
     "\n"
     "Usa o modelo `llama3:8b` para responder perguntas sobre os dados contidos em arquivos CSV."
     "Para mais informações sobre o projeto consulte o [repositório](https://github.com/BernardoMoschen/i2a2-metadron/tree/main/entregas/desafio_03)."
 )
-uploaded_file = st.file_uploader("Arraste ou selecione um arquivo CSV ou ZIP", type=["csv", "zip"])
+
+st.divider()
+
+
+uploaded_file = st.file_uploader("Arraste ou selecione um arquivo CSV ou ZIP", type=["csv", "zip"], help="")
 
 if uploaded_file:
     data_folder = "./data"
@@ -53,4 +66,4 @@ if uploaded_file:
             with st.spinner("Pensando..."):
                 answer = agent.query_data(selected_file, question)
             st.success("Resposta:")
-            st.markdown(f"<div style='background:#fff;border-radius:8px;padding:1em 1.5em;border:1.5px solid #6366f1;font-size:1.1em'>{answer}</div>", unsafe_allow_html=True)
+            st.markdown(f"<div style='background:transparent;border-radius:8px;padding:1em 1.5em;border:1.5px solid #6366f1;font-size:1.1em'>{answer}</div>", unsafe_allow_html=True)
