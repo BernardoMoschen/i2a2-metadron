@@ -2,7 +2,6 @@ import os
 from agents.csv_cloud_agent import CSVAgent
 import streamlit as st
 import pandas as pd
-import zipfile
 
 
 
@@ -27,27 +26,31 @@ st.write(
 st.divider()
 
 
-uploaded_file = st.file_uploader("Arraste ou selecione um arquivo CSV ou ZIP", type=["csv", "zip"], help="")
+uploaded_file = st.file_uploader("Arraste ou selecione um arquivo CSV ou ZIP", type=["csv", "zip"], help="Formatos aceitos: .csv (individual) ou .zip (contendo vários CSVs)")
 
 if uploaded_file:
     data_folder = "./data"
     os.makedirs(data_folder, exist_ok=True)
+    
     # Limpa arquivos antigos
     for f in os.listdir(data_folder):
-        os.remove(os.path.join(data_folder, f))
-    # Salva e descompacta se necessário
-    if uploaded_file.name.endswith(".zip"):
-        zip_path = os.path.join(data_folder, uploaded_file.name)
-        with open(zip_path, "wb") as f:
-            f.write(uploaded_file.getbuffer())
-        with zipfile.ZipFile(zip_path, "r") as zip_ref:
-            zip_ref.extractall(data_folder)
-    else:
-        csv_path = os.path.join(data_folder, uploaded_file.name)
-        with open(csv_path, "wb") as f:
-            f.write(uploaded_file.getbuffer())
-
+        file_path = os.path.join(data_folder, f)
+        if os.path.isfile(file_path):
+            os.remove(file_path)
+    
+    # Inicializar agente
     agent = CSVAgent(data_folder)
+    
+    # Processar arquivo enviado
+    with st.spinner("Processando arquivo..."):
+        processed_files = agent.process_uploaded_file(uploaded_file)
+    
+    if processed_files:
+        st.success(f"Processados {len(processed_files)} arquivo(s)!")
+        for file in processed_files:
+            st.write(f"📄 {file}")
+    
+    # Carregar dados existentes
     agent.load_data()
     files = agent.list_files()
     st.markdown("""
@@ -67,3 +70,9 @@ if uploaded_file:
                 answer = agent.query_data(selected_file, question)
             st.success("Resposta:")
             st.markdown(f"<div style='background:transparent;border-radius:8px;padding:1em 1.5em;border:1.5px solid #6366f1;font-size:1.1em'>{answer}</div>", unsafe_allow_html=True)
+
+# Botão de limpeza (opcional)
+if st.button("🧹 Limpar cache e arquivos temporários"):
+    if 'agent' in locals():
+        agent.cleanup()
+    st.rerun()
