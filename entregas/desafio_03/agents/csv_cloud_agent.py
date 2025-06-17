@@ -24,12 +24,13 @@ class CSVAgent:
 
     def query_data(self, filename, question):
         df = self.dataframes[filename]
-        sample = df.head(10).to_csv(index=False)
+        sample = df 
         prompt = (
             f"You are a data analyst. Given this CSV preview:\n\n"
             f"{sample}\n\n"
             f"User question: {question}\n\n"
             f"Answer as clearly and accurately as possible."
+            f"Answer always in portuguese, unless asked not to."
         )
         
         try:
