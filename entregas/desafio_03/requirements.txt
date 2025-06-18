@@ -11,4 +11,5 @@ requests
 openai
 plotly
 seaborn
+transformers
 matplotlib
