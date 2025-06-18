@@ -7,7 +7,7 @@ import plotly.graph_objects as go
 
 # --- Configuração da página ---
 st.set_page_config(
-    page_title="CSV Agent Pro - Metadron", 
+    page_title="CSV Agent - Metadron", 
     page_icon="🤖", 
     layout="wide",
     initial_sidebar_state="expanded"
