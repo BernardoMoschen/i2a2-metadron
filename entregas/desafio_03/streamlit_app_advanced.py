@@ -64,7 +64,7 @@ st.markdown("""
     }
     .step-header {
         background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
-        padding: 1rem 1.5rem;
+        padding: 0.5rem 0.5rem;
         border-radius: 12px;
         border-left: 5px solid #667eea;
         margin: 2rem 0 1rem 0;
@@ -102,6 +102,7 @@ st.markdown("""
         box-shadow: 0 2px 8px rgba(0,0,0,0.2);
         color: #ecf0f1;
     }
+    
     /* Customização do Streamlit para dark mode */
     .stApp {
         background-color: #1e2936;
@@ -118,71 +119,11 @@ st.markdown("""
 # --- Header principal ---
 st.markdown("""
 <div class="main-header">
-    <h1>🤖 CSV Agent Pro - Metadron</h1>
+    <h1>🤖 CSV Agent - Metadron</h1>
     <p style="font-size: 1.2em;">Análise inteligente e visualização de dados CSV com IA</p>
 </div>
 """, unsafe_allow_html=True)
 
-# --- Sidebar ---
-with st.sidebar:
-    st.markdown("### 🎯 Dashboard de Controle")
-    
-    # Status do sistema
-    st.markdown("#### 🟢 Status do Sistema")
-    st.success("✅ Sistema Online")
-    st.info("🔗 API Conectada")
-    st.info("🧠 Modelo: Llama-3-8B")
-    
-    st.markdown("---")
-    
-    st.markdown("### 📊 Estatísticas da Sessão")
-    if 'questions_asked' not in st.session_state:
-        st.session_state.questions_asked = 0
-    if 'files_processed' not in st.session_state:
-        st.session_state.files_processed = 0
-    
-    st.metric("Perguntas Feitas", st.session_state.questions_asked)
-    st.metric("Arquivos Processados", st.session_state.files_processed)
-    
-    st.markdown("---")
-    
-    st.markdown("### 💡 Dicas Avançadas")
-    with st.expander("🔍 Perguntas Básicas"):
-        st.markdown("""
-        - "Quantas linhas e colunas tem?"
-        - "Quais são os tipos de dados?"
-        - "Mostre as primeiras linhas"
-        - "Há valores nulos?"
-        """)
-    
-    with st.expander("📊 Análises Estatísticas"):
-        st.markdown("""
-        - "Calcule a média da coluna X"
-        - "Qual o valor máximo em Y?"
-        - "Mostre a distribuição dos dados"
-        - "Encontre outliers"
-        """)
-    
-    with st.expander("🔗 Análise Comparativa"):
-        st.markdown("""
-        - "Compare arquivos A e B"
-        - "Qual arquivo tem mais dados?"
-        - "Encontre diferenças entre datasets"
-        """)
-    
-    st.markdown("---")
-    
-    # Links úteis
-    st.markdown("### 🔗 Links Úteis")
-    st.markdown("[📂 GitHub](https://github.com/BernardoMoschen/i2a2-metadron)")
-    st.markdown("[📚 Documentação](https://github.com/BernardoMoschen/i2a2-metadron/tree/main/entregas/desafio_03)")
-    
-    st.markdown("---")
-    
-    # Controles avançados
-    st.markdown("### ⚙️ Configurações")
-    sample_size = st.slider("Tamanho da Amostra", 10, 100, 50, help="Número de linhas enviadas para a IA")
-    show_debug = st.checkbox("Modo Debug", help="Mostra informações técnicas")
 
 # --- Métricas principais ---
 col1, col2, col3, col4 = st.columns(4)
@@ -223,7 +164,8 @@ with col4:
     """, unsafe_allow_html=True)
 
 # --- Seção de Upload ---
-st.markdown('<div class="step-header"><h3>📁 Passo 1: Envie seus dados</h3></div>', unsafe_allow_html=True)
+st.markdown('---')
+st.markdown('<div class="step-header"><h5>📁 Passo 1: Envie seus dados</h5></div>', unsafe_allow_html=True)
 
 uploaded_files = st.file_uploader(
     "Arraste ou clique para selecionar arquivos", 
@@ -257,29 +199,14 @@ if uploaded_files:
     
     st.session_state.files_processed = len(all_processed_files)
     
-    if all_processed_files:
-        st.markdown('<div class="step-header"><h3>✅ Arquivos Processados</h3></div>', unsafe_allow_html=True)
-        
-        # Mostrar arquivos em grid
-        cols = st.columns(min(3, len(all_processed_files)))
-        for i, file in enumerate(all_processed_files):
-            with cols[i % 3]:
-                st.markdown(f"""
-                <div class="file-card">
-                    <h4 style="margin:0; color:#28a745;">📄 {file}</h4>
-                    <p style="margin:0.5rem 0 0 0; color:#bdc3c7; font-size:0.9em;">
-                        Pronto para análise
-                    </p>
-                </div>
-                """, unsafe_allow_html=True)
-    
     # Carregar dados existentes
     agent.load_data()
     files = agent.list_files()
     
     if files:
         # --- Seção de Seleção de Arquivo ---
-        st.markdown('<div class="step-header"><h3>🎯 Passo 2: Análise de dados</h3></div>', unsafe_allow_html=True)
+        st.markdown('---')
+        st.markdown('<div class="step-header"><h5>🎯 Passo 2: Análise de dados</h5></div>', unsafe_allow_html=True)
         
         # Seleção de modo de análise
         analysis_mode = st.radio(
@@ -314,7 +241,7 @@ if uploaded_files:
                 tab1, tab2, tab3, tab4 = st.tabs(["📋 Dados", "📊 Informações", "🔢 Estatísticas", "📈 Gráficos"])
                 
                 with tab1:
-                    st.dataframe(df.head(sample_size), use_container_width=True)
+                    st.dataframe(df, use_container_width=True)
                 
                 with tab2:
                     col1, col2 = st.columns(2)
@@ -419,7 +346,8 @@ if uploaded_files:
                 st.plotly_chart(fig, use_container_width=True)
         
         # --- Seção de Perguntas ---
-        st.markdown('<div class="step-header"><h3>💬 Passo 3: Faça sua pergunta</h3></div>', unsafe_allow_html=True)
+        st.markdown('---')
+        st.markdown('<div class="step-header"><h5>Passo 3: Faça sua pergunta</h5></div>', unsafe_allow_html=True)
         
         # Perguntas sugeridas mais avançadas
         st.markdown("**💡 Sugestões de perguntas avançadas:**")
@@ -489,8 +417,9 @@ if uploaded_files:
                 if show_debug:
                     with st.expander("🔧 Informações de Debug"):
                         st.write(f"**Arquivo analisado:** {selected_file}")
-                        st.write(f"**Linhas no sample:** {sample_size}")
-                        st.write(f"**Tamanho total do dataset:** {len(agent.dataframes[selected_file])}")
+                        st.write(f"**Dataset completo:** {len(agent.dataframes[selected_file])} linhas")
+                        st.write(f"**Colunas:** {len(agent.dataframes[selected_file].columns)}")
+                        st.write(f"**✅ Sem amostragem - dados completos enviados para IA**")
                 
                 # Limpar sugestão após uso
                 if 'suggested_question' in st.session_state:
@@ -505,62 +434,78 @@ if uploaded_files:
         elif analyze_button:
             st.warning("⚠️ Por favor, digite uma pergunta antes de analisar!")
 
-else:
-    # Tela inicial aprimorada
-    st.markdown("""
-    <div class="upload-area">
-        <h2 style="color:#667eea; margin-bottom:1rem;">🎯 Bem-vindo ao CSV Agent Pro!</h2>
-        <p style='font-size: 1.2em; color: #ecf0f1; margin-bottom:2rem;'>
-            Análise inteligente de dados com IA de última geração
-        </p>
-        <div style="display: flex; justify-content: space-around; margin: 2rem 0;">
-            <div style="text-align: center;">
-                <h3 style="color:#28a745;">📁</h3>
-                <p style="color:#bdc3c7;"><strong>Upload</strong><br>CSV ou ZIP</p>
-            </div>
-            <div style="text-align: center;">
-                <h3 style="color:#667eea;">🎯</h3>
-                <p style="color:#bdc3c7;"><strong>Selecione</strong><br>Arquivos</p>
-            </div>
-            <div style="text-align: center;">
-                <h3 style="color:#dc3545;">💬</h3>
-                <p style="color:#bdc3c7;"><strong>Pergunte</strong><br>à IA</p>
-            </div>
-            <div style="text-align: center;">
-                <h3 style="color:#ffc107;">🚀</h3>
-                <p style="color:#bdc3c7;"><strong>Obtenha</strong><br>Insights</p>
-            </div>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-
 # --- Footer aprimorado ---
-st.markdown("---")
-col1, col2, col3, col4 = st.columns(4)
 
-with col1:
-    if st.button("🧹 Limpar Cache", help="Remove arquivos temporários"):
-        if 'agent' in locals():
-            agent.cleanup()
-        # Reset session state
-        for key in ['questions_asked', 'files_processed', 'suggested_question']:
-            if key in st.session_state:
+
+# --- Sidebar ---
+with st.sidebar:
+    # Status do sistema
+    st.markdown("#### Status do Sistema")
+    st.info("🧠 Modelo: Llama-3-8B")
+    col1, col2 = st.columns(2)
+    with col1:
+        if st.button("🧹 Limpar Cache", help="Remove arquivos temporários"):
+            if 'agent' in locals():
+                agent.cleanup()
+            # Reset session state
+            for key in ['questions_asked', 'files_processed', 'suggested_question']:
+                if key in st.session_state:
+                    del st.session_state[key]
+            st.rerun()
+
+    with col2:
+        if st.button("🔄 Resetar Sessão"):
+            for key in list(st.session_state.keys()):
                 del st.session_state[key]
-        st.rerun()
-
-with col2:
-    if st.button("🔄 Reset Sessão"):
-        for key in list(st.session_state.keys()):
-            del st.session_state[key]
-        st.rerun()
-
-with col3:
-    if st.button("📊 Estatísticas"):
-        st.info(f"Sessão atual: {st.session_state.questions_asked} perguntas, {st.session_state.files_processed} arquivos")
-
-with col4:
-    st.markdown("""
-    <div style='text-align: right; color: #667eea; font-size: 0.9em; font-weight: bold;'>
-        🚀 Powered by Metadron Team
-    </div>
-    """, unsafe_allow_html=True)
+            st.rerun()
+    
+    st.markdown("---")
+    
+    st.markdown("### 📊 Estatísticas da Sessão")
+    if 'questions_asked' not in st.session_state:
+        st.session_state.questions_asked = 0
+    if 'files_processed' not in st.session_state:
+        st.session_state.files_processed = 0
+    
+    st.metric("Perguntas Feitas", st.session_state.questions_asked)
+    st.metric("Arquivos Processados", st.session_state.files_processed)
+    
+    st.markdown("---")
+    
+    st.markdown("### 💡 Dicas Avançadas")
+    with st.expander("🔍 Perguntas Básicas"):
+        st.markdown("""
+        - "Quantas linhas e colunas tem?"
+        - "Quais são os tipos de dados?"
+        - "Mostre as primeiras linhas"
+        - "Há valores nulos?"
+        """)
+    
+    with st.expander("📊 Análises Estatísticas"):
+        st.markdown("""
+        - "Calcule a média da coluna X"
+        - "Qual o valor máximo em Y?"
+        - "Mostre a distribuição dos dados"
+        - "Encontre outliers"
+        """)
+    
+    with st.expander("🔗 Análise Comparativa"):
+        st.markdown("""
+        - "Compare arquivos A e B"
+        - "Qual arquivo tem mais dados?"
+        - "Encontre diferenças entre datasets"
+        """)
+    
+    st.markdown("---")
+    
+    # Links úteis
+    st.markdown("### 🔗 Links Úteis")
+    st.markdown("[📂 GitHub](https://github.com/BernardoMoschen/i2a2-metadron)")
+    st.markdown("[📚 Documentação](https://github.com/BernardoMoschen/i2a2-metadron/tree/main/entregas/desafio_03)")
+    
+    st.markdown("---")
+    
+    # Controles avançados
+    st.markdown("### ⚙️ Configurações")
+    show_debug = st.checkbox("Modo Debug", help="Mostra informações técnicas")
+    st.info("✅ **Dataset Completo**: Este agente analisa todos os dados sem amostragem!")

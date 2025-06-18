@@ -29,21 +29,17 @@ class CSVAgent:
     def query_data(self, filename, question):
         df = self.dataframes[filename]
         
-        # Amostragem inteligente baseada no tamanho do DataFrame
-        if len(df) > 100:
-            sample = df.head(50).to_csv(index=False)
-            sample_info = f"(Mostrando as primeiras 50 linhas de {len(df)} total)"
-        else:
-            sample = df.to_csv(index=False)
-            sample_info = f"(Dataset completo com {len(df)} linhas)"
+        # Usar o dataset COMPLETO - SEM qualquer amostragem
+        sample = df.to_csv(index=False)
+        sample_info = f"(Dataset completo: {len(df)} linhas, {len(df.columns)} colunas)"
         
         prompt = (
             f"You are a data analyst. Given this CSV data from file '{filename}' {sample_info}:\n\n"
             f"{sample}\n\n"
             f"User question: {question}\n\n"
             f"Answer as clearly and accurately as possible. "
-            f"If the question involves calculations or aggregations, mention that you're working with a sample if applicable. "
-            f"Answer always in portuguese, unless asked not to."
+            f"You have access to the complete dataset for accurate analysis. "
+            # f"Answer always in portuguese, unless asked not to."
         )
         
         try:
