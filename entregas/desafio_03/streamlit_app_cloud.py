@@ -413,14 +413,6 @@ if uploaded_files:
                 </div>
                 """, unsafe_allow_html=True)
                 
-                # Mostrar informações de debug se habilitado
-                if show_debug:
-                    with st.expander("🔧 Informações de Debug"):
-                        st.write(f"**Arquivo analisado:** {selected_file}")
-                        st.write(f"**Dataset completo:** {len(agent.dataframes[selected_file])} linhas")
-                        st.write(f"**Colunas:** {len(agent.dataframes[selected_file].columns)}")
-                        st.write(f"**✅ Sem amostragem - dados completos enviados para IA**")
-                
                 # Limpar sugestão após uso
                 if 'suggested_question' in st.session_state:
                     del st.session_state.suggested_question
@@ -433,9 +425,6 @@ if uploaded_files:
         
         elif analyze_button:
             st.warning("⚠️ Por favor, digite uma pergunta antes de analisar!")
-
-# --- Footer aprimorado ---
-
 
 # --- Sidebar ---
 with st.sidebar:
@@ -502,10 +491,3 @@ with st.sidebar:
     st.markdown("### 🔗 Links Úteis")
     st.markdown("[📂 GitHub](https://github.com/BernardoMoschen/i2a2-metadron)")
     st.markdown("[📚 Documentação](https://github.com/BernardoMoschen/i2a2-metadron/tree/main/entregas/desafio_03)")
-    
-    st.markdown("---")
-    
-    # Controles avançados
-    st.markdown("### ⚙️ Configurações")
-    show_debug = st.checkbox("Modo Debug", help="Mostra informações técnicas")
-    st.info("✅ **Dataset Completo**: Este agente analisa todos os dados sem amostragem!")

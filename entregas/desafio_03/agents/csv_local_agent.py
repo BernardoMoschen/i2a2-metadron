@@ -7,6 +7,8 @@ import streamlit as st
 import zipfile
 import tempfile
 import shutil
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+from transformers import AutoTokenizer
 
 class CSVAgent:
     def __init__(self, folder):
@@ -124,15 +126,45 @@ class CSVAgent:
                 shutil.rmtree(temp_dir)
             except:
                 pass
-
-    def query_data(self, filename, question):
+            
+    def query_data(self, filename, question, chunk_size=2000, chunk_overlap=200, max_tokens=3500):
         df = self.dataframes.get(filename)
         if df is None:
             return f"Arquivo {filename} não encontrado."
+        
+        # 1. Converter o DataFrame em uma lista de documentos (ex: cada linha é um documento)
+        docs = [
+            f"{row.to_dict()}" for _, row in df.iterrows()
+        ]
+        
+        # 2. Chunking inteligente dos dados
+        splitter = RecursiveCharacterTextSplitter(chunk_size=chunk_size, chunk_overlap=chunk_overlap)
+        chunks = splitter.split_text("\n".join(docs))
+        
+        # 3. Calcular tokens e limitar contexto
+        # tokenizer = AutoTokenizer.from_pretrained("meta-llama/Meta-Llama-3-8B")
+        tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
+        selected_chunks = []
+        total_tokens = 0
+        for chunk in chunks:
+            chunk_tokens = len(tokenizer.encode(chunk))
+            if total_tokens + chunk_tokens > max_tokens:
+                break
+            selected_chunks.append(chunk)
+            total_tokens += chunk_tokens
+        
+        # 4. Montar prompt com os chunks selecionados
+        context = "\n---\n".join(selected_chunks)
+        prompt = (
+            f"Você é um analista de dados. Use apenas os dados abaixo do arquivo '{filename}' para responder.\n"
+            f"DADOS:\n{context}\n\n"
+            f"Pergunta do usuário: {question}\n"
+            f"Responda sempre em português."
+        )
+        
         llm = OllamaLLM(model="llama3:8b")
         agent = create_pandas_dataframe_agent(llm, df, verbose=False, allow_dangerous_code=True)
         try:
-            question_pt = f"Responda sempre em português. {question}"
-            return agent.invoke(question_pt)
+            return agent.invoke(prompt)
         except Exception as e:
             return f"Erro ao processar a pergunta: {e}"
