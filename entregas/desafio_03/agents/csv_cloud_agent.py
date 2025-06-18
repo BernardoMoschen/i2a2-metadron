@@ -28,12 +28,21 @@ class CSVAgent:
 
     def query_data(self, filename, question):
         df = self.dataframes[filename]
-        sample = df 
+        
+        # Amostragem inteligente baseada no tamanho do DataFrame
+        if len(df) > 100:
+            sample = df.head(50).to_csv(index=False)
+            sample_info = f"(Mostrando as primeiras 50 linhas de {len(df)} total)"
+        else:
+            sample = df.to_csv(index=False)
+            sample_info = f"(Dataset completo com {len(df)} linhas)"
+        
         prompt = (
-            f"You are a data analyst. Given this CSV preview:\n\n"
+            f"You are a data analyst. Given this CSV data from file '{filename}' {sample_info}:\n\n"
             f"{sample}\n\n"
             f"User question: {question}\n\n"
-            f"Answer as clearly and accurately as possible."
+            f"Answer as clearly and accurately as possible. "
+            f"If the question involves calculations or aggregations, mention that you're working with a sample if applicable. "
             f"Answer always in portuguese, unless asked not to."
         )
         
@@ -49,7 +58,23 @@ class CSVAgent:
             )
             return completion.choices[0].message.content
         except Exception as e:
-            st.error(f"Ocorreu um erro ao consultar o modelo: {e}")
+            return f"Erro ao consultar o modelo: {e}"
+
+    def get_file_summary(self, filename):
+        """Retorna um resumo do arquivo"""
+        if filename not in self.dataframes:
+            return "Arquivo não encontrado"
+        
+        df = self.dataframes[filename]
+        summary = {
+            'nome': filename,
+            'linhas': len(df),
+            'colunas': len(df.columns),
+            'colunas_list': list(df.columns),
+            'tipos': dict(df.dtypes.astype(str)),
+            'tamanho_mb': df.memory_usage(deep=True).sum() / (1024 * 1024)
+        }
+        return summary
 
     def extract_zip_files(self, zip_path):
         """Extrai arquivos CSV de um ZIP"""
