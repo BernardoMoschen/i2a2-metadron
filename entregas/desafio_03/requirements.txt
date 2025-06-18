@@ -9,3 +9,6 @@ tabulate
 streamlit
 requests
 openai
+plotly
+seaborn
+matplotlib

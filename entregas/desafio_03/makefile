@@ -1,6 +1,10 @@
-# Roda a interface web com Streamlit
-run-streamlit:
-	streamlit run ./streamlit_app.py
+# Roda a interface web com Streamlit e IA LOCAl
+run-local:
+	streamlit run ./streamlit_app_local.py
+
+# Roda a interface web com Streamlit e IA CLOUD
+run-cloud:
+	streamlit run ./streamlit_app_cloud.py
 
 # Inicia o servidor Ollama (necessário para o agente LLM)
 ollama-serve:

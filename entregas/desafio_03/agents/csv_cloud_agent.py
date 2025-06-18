@@ -5,52 +5,46 @@ from openai import OpenAI
 import zipfile
 import tempfile
 import shutil
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+from transformers import AutoTokenizer
+
 
 class CSVAgent:
     def __init__(self, folder):
         self.folder = folder
         self.dataframes = {}
-        self.temp_dirs = []  # Para limpar diretórios temporários depois
+        self.temp_dirs = []
         self.client = OpenAI(
             base_url="https://openrouter.ai/api/v1",
             api_key=f"{st.secrets['API_KEY']}",
         )
 
     def load_data(self):
-        for file in os.listdir(self.folder):
-            if file.endswith(".csv"):
-                path = os.path.join(self.folder, file)
-                df = pd.read_csv(path)
-                self.dataframes[file] = df
+        for fname in os.listdir(self.folder):
+            if fname.endswith(".csv"):
+                path = os.path.join(self.folder, fname)
+                self.dataframes[fname] = pd.read_csv(path)
 
     def list_files(self):
         return list(self.dataframes.keys())
-
-    def query_data(self, filename, question):
-        df = self.dataframes[filename]
-        sample = df 
-        prompt = (
-            f"You are a data analyst. Given this CSV preview:\n\n"
-            f"{sample}\n\n"
-            f"User question: {question}\n\n"
-            f"Answer as clearly and accurately as possible."
-            f"Answer always in portuguese, unless asked not to."
-        )
+    
+    def get_file_summary(self, filename):
+        """Retorna um resumo do arquivo"""
+        if filename not in self.dataframes:
+            return "Arquivo não encontrado"
         
-        try:
-            completion = self.client.chat.completions.create(
-                model="meta-llama/llama-3-8b-instruct",
-                messages=[
-                    {
-                        "role": "user",
-                        "content": prompt
-                    }
-                ]
-            )
-            return completion.choices[0].message.content
-        except Exception as e:
-            st.error(f"Ocorreu um erro ao consultar o modelo: {e}")
+        df = self.dataframes[filename]
+        summary = {
+            'nome': filename,
+            'linhas': len(df),
+            'colunas': len(df.columns),
+            'colunas_list': list(df.columns),
+            'tipos': dict(df.dtypes.astype(str)),
+            'tamanho_mb': df.memory_usage(deep=True).sum() / (1024 * 1024)
+        }
+        return summary
 
+    # ... resto dos métodos permanecem iguais ...
     def extract_zip_files(self, zip_path):
         """Extrai arquivos CSV de um ZIP"""
         extracted_files = []
@@ -135,3 +129,56 @@ class CSVAgent:
                 shutil.rmtree(temp_dir)
             except:
                 pass
+            
+    def query_data(self, filename, question, chunk_size=2000, chunk_overlap=200, max_tokens=3500):
+        df = self.dataframes.get(filename)
+        if df is None:
+            return f"Arquivo {filename} não encontrado."
+        
+        # 1. Converter o DataFrame em uma lista de documentos (ex: cada linha é um documento)
+        docs = [
+            f"{row.to_dict()}" for _, row in df.iterrows()
+        ]
+        
+        # 2. Chunking inteligente dos dados
+        splitter = RecursiveCharacterTextSplitter(chunk_size=chunk_size, chunk_overlap=chunk_overlap)
+        chunks = splitter.split_text("\n".join(docs))
+        
+        # 3. Calcular tokens e limitar contexto
+        # tokenizer = AutoTokenizer.from_pretrained("meta-llama/Meta-Llama-3-8B")
+        tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
+        selected_chunks = []
+        total_tokens = 0
+        for chunk in chunks:
+            chunk_tokens = len(tokenizer.encode(chunk))
+            if total_tokens + chunk_tokens > max_tokens:
+                break
+            selected_chunks.append(chunk)
+            total_tokens += chunk_tokens
+        
+        # 4. Montar prompt com os chunks selecionados
+        context = "\n---\n".join(selected_chunks)
+        prompt = (
+            f"Você é um analista de dados. Use apenas os dados abaixo do arquivo '{filename}' para responder.\n"
+            f"DADOS:\n{context}\n\n"
+            f"Pergunta do usuário: {question}\n"
+            f"Responda sempre em português."
+        )
+        
+        try:
+            completion = self.client.chat.completions.create(
+                model="meta-llama/llama-3-8b-instruct",
+                messages=[
+                    {
+                        "role": "user",
+                        "content": prompt
+                    }
+                ]
+            )
+            
+            # Adicionar informações de debug se necessário
+            response = completion.choices[0].message.content
+            return response
+            
+        except Exception as e:
+            return f"Erro ao processar a pergunta: {e}"
